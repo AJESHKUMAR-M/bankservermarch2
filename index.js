@@ -3,12 +3,25 @@
 //package.jason creation
 //import express 
 const  express = require('express')
+
 //import jwt
 const jwt = require('jsonwebtoken')
+
+//import cors
+const cors = require('cors')
+
 //import dataservice
 const dataService = require('./sevice/dataservice')
-//sever application
+
+//sever application server app creaton using express
 const bankapp = express()
+
+//cors use in server app
+bankapp.use(cors({
+    origin:'http://localhost:4200'
+}))
+
+//parse json data
 bankapp.use(express.json())
 //application speciffic middleware
 const appMiddleware =(req,res,next)=>{
@@ -36,12 +49,16 @@ catch{
 }
 
 //bankapp server
+//register api
 bankapp.post('/register',(req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     //register solving
-const result= dataService.register(req.body.username,req.body.acno,req.body.pass)
+dataService.register(req.body.username,req.body.acno,req.body.password)
+.then(result=>{
+    res.status(result.statusCode).json(result)
+})
 
-res.status(result.statusCode).json(result)
+
 // if(result){
 //     res.send("register success")
 // }
@@ -49,39 +66,55 @@ res.status(result.statusCode).json(result)
 //     res.send("already existed...please log in")
 // }
 })
+//login api
+
 bankapp.post('/login',(req, res) => {
     console.log(req.body);
     //register solving
-const result= dataService.login(req.body.acno,req.body.pass)
+ dataService.login(req.body.acno,req.body.pass)
+ .then(result=>{
+    res.status(result.statusCode).json(result)
 
-res.status(result.statusCode).json(result)
+ })
 })
-//withdraw
+
+
+//withdraw api-asynchronus
 bankapp.post('/withdraw',jwtMiddleware,(req, res) => {
     console.log(req.body);
-    //register solving
-const result= dataService.withdraw(req.body.acno,req.body.pass,req.body.amt)
+    //withdra solving
+dataService.withdraw(req.body.acno,req.body.pass,req.body.amt)
 
-res.status(result.statusCode).json(result)
+.then(result=>{
+    res.status(result.statusCode).json(result)
+
+ })
 })
 
 
-//deposit
+//depositasynchrous
 bankapp.post('/deposit',jwtMiddleware,(req, res) => {
     console.log(req.body);
-    //register solving
-const result= dataService.deposit(req.body.acno,req.body.password,req.body.amt)
+    //deposit solving
+dataService.deposit(req.body.acno,req.body.pass,req.body.amt)
 
-res.status(result.statusCode).json(result)
+.then(result=>{
+    res.status(result.statusCode).json(result)
+
+ })
 })
+
+
 //transaction
 bankapp.post('/transaction',jwtMiddleware,(req, res) => {
     console.log(req.body);
     //register solving
-const result= dataService.getTransaction(req.body.acno)
+dataService.getTransaction(req.body.acno)
 
-res.status(result.statusCode).json(result)
-})
+.then(result=>{
+    res.status(result.statusCode).json(result)
+
+ })})
 
 
 
